@@ -1,0 +1,25 @@
+CxList ifs = All.FindByType(typeof(IfStmt));
+List < string > methodsNames = new List<string>{"geteuid", "getuid", "getgid", "getegid"};
+foreach(CxList ifstmt in ifs)
+{
+        CxList andBin = All.GetByAncs(ifstmt).FindByType(typeof(BinaryExpr)).FindByName("&&");
+        if(andBin.Count == 0)
+        {
+               CxList relevantChildren = All.FindByFathers(All.FindByFathers(ifstmt)).FindByShortNames(methodsNames);
+ 
+               if(relevantChildren.Count > 0)
+               {
+                       result.Add(ifstmt);
+               }
+        } else {
+               CxList eqBin = All.FindByFathers(andBin).FindByName("==");
+               if(eqBin.Count > 0)
+               {
+                       CxList methCompared = All.FindByFathers(eqBin).FindByType(typeof(MethodInvokeExpr));
+                       if(methCompared.FindByShortNames(methodsNames).Count < 4)
+                       {
+                               result.Add(ifstmt);
+                       }
+               }
+        }
+}
